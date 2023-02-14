@@ -32,19 +32,19 @@ enum som_storage {
 
 struct __attribute__((packed)) var_eeprom
 {
-	u16 magic;                /* 00-0x00 - magic number       */
-	u8 partnum[3];            /* 02-0x02 - part number        */
-	u8 assembly[10];          /* 05-0x05 - assembly number    */
-	u8 date[9];               /* 15-0x0f - build date         */
-	u8 mac[6];                /* 24-0x18 - MAC address        */
-	u8 somrev;                /* 30-0x1e - SOM revision       */
-	u8 version;               /* 31-0x1f - EEPROM version     */
-	u8 features;              /* 32-0x20 - SOM features       */
-	u8 dramsize;              /* 33-0x21 - DRAM size          */
-	u8 off[DRAM_TABLE_NUM+1]; /* 34-0x22 - DRAM table offsets */
-	u8 partnum2[5];           /* 42-0x2a - part number        */
-	u8 reserved[5];           /* 47 0x2f - reserved           */
-	u16 fsp_drate;            /* 52-0x34 - U-Boot ddr_dram_fsp_msg.drate */
+	u16 magic;                  /* 00-0x00 - magic number       */
+	u8 partnum[3];              /* 02-0x02 - part number        */
+	u8 assembly[10];            /* 05-0x05 - assembly number    */
+	u8 date[9];                 /* 15-0x0f - build date         */
+	u8 mac[6];                  /* 24-0x18 - MAC address        */
+	u8 somrev;                  /* 30-0x1e - SOM revision       */
+	u8 version;                 /* 31-0x1f - EEPROM version     */
+	u8 features;                /* 32-0x20 - SOM features       */
+	u8 dramsize;                /* 33-0x21 - DRAM size          */
+	u16 off[DRAM_TABLE_NUM+1];  /* 34-0x22 - DRAM table offsets */
+	u8 partnum2[5];             /* 50-0x32 - part number        */
+	u8 reserved[5];             /* 55 0x37 - reserved           */
+	u16 fsp_drate;              /* 60-0x3c - U-Boot ddr_dram_fsp_msg.drate */
 };
 
 #define VAR_EEPROM_DATA ((struct var_eeprom *)VAR_EEPROM_DRAM_START)

@@ -183,7 +183,7 @@ static void adjust_dram_table(u8 adj_table_offset, u8 adj_table_size,
 void var_eeprom_adjust_dram(struct var_eeprom *ep, struct dram_timing_info *d)
 {
 	int i;
-	u8 adj_table_size[DRAM_TABLE_NUM];
+	u16 adj_table_size[DRAM_TABLE_NUM];
 
 	/* Aligned with Variscite SoM EEPROM DDR Adjust Tables */
 	struct mx9_ddr_adjust mx9_adjust_table[] = {
