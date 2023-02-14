@@ -127,6 +127,35 @@ void var_eeprom_print_prod_info(struct var_eeprom *ep)
 #endif
 
 #if defined(CONFIG_SPL_BUILD)
+static int var_eeprom_crc32(struct var_eeprom *ep, const uint32_t offset,
+							const uint32_t len, uint32_t * crc32_val) {
+	uint32_t i;
+	struct udevice *dev;
+	int ret;
+
+	/* No data in EEPROM - return -1 */
+	if (!var_eeprom_is_valid(ep)) {
+		return -1;
+	}
+
+	ret = var_eeprom_get_dev(&dev);
+	if (ret) {
+		debug("%s: Failed 2 to detect I2C EEPROM\n", __func__);
+		return ret;
+	}
+
+	*crc32_val = crc32(0, NULL, 0);
+	for (i = 0; i < len; i++) {
+		uint8_t data;
+		dm_i2c_read(dev, offset + i, &data, 1);
+		*crc32_val = crc32(*crc32_val, &data, 1);
+	}
+
+	debug("%s: crc32=0x%08x (offset=%d len=%d)\n", __func__, *crc32_val, offset, len);
+
+	return 0;
+}
+
 /*
  * Modify DRAM table based on adjustment table in EEPROM
  *
@@ -184,6 +213,7 @@ void var_eeprom_adjust_dram(struct var_eeprom *ep, struct dram_timing_info *d)
 {
 	int i;
 	u16 adj_table_size[DRAM_TABLE_NUM];
+	u32 ddr_crc32, ddr_adjust_bytes = 0;
 
 	/* Aligned with Variscite SoM EEPROM DDR Adjust Tables */
 	struct mx9_ddr_adjust mx9_adjust_table[] = {
@@ -209,13 +239,32 @@ void var_eeprom_adjust_dram(struct var_eeprom *ep, struct dram_timing_info *d)
 		debug("off[%d]=%d\n", i, ep->off[i]);
 
 	/* Calculate DRAM adjustment table sizes */
-	for (i = 0; i < DRAM_TABLE_NUM && ep->off[i + 1] != 0; i++)
+	for (i = 0; i < DRAM_TABLE_NUM && ep->off[i + 1] != 0; i++) {
 		adj_table_size[i] = (ep->off[i + 1] - ep->off[i]) /
 				(sizeof(struct dram_cfg_param));
+
+		/* Calculate the total size of the ddr adjust tables */
+		ddr_adjust_bytes += ep->off[i + 1] - ep->off[i];
+	}
 
 	debug("\nSizes table\n");
 	for (i = 0; i < DRAM_TABLE_NUM; i++)
 		debug("sizes[%d]=%d\n", i, adj_table_size[i]);
+
+	/* Calculate DDR Adjust table CRC32 */
+	if (var_eeprom_crc32(ep, ep->off[0], ddr_adjust_bytes, &ddr_crc32)) {
+		printf("%s: Error: DDR adjust table crc calculation failed\n", __func__);
+		return;
+	}
+
+	/* Verify DDR Adjust table CRC32 */
+	if (ddr_crc32 != ep->ddr_crc32) {
+		printf("%s: Error: DDR adjust table invalid CRC "
+			"eeprom=0x%08x, calculated=0x%08x, len=%d\n",
+			__func__, ep->ddr_crc32, ddr_crc32, ddr_adjust_bytes);
+		return;
+	}
+	debug("crc32: eeprom=0x%08x, calculated=0x%08x, len=%d\n", ep->ddr_crc32, ddr_crc32, ddr_adjust_bytes);
 
 	/* Adjust all DDR Tables */
 	for (i = 0; mx9_adjust_table[i].name != NULL; i++)

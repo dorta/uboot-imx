@@ -44,7 +44,8 @@ struct __attribute__((packed)) var_eeprom
 	u16 off[DRAM_TABLE_NUM+1];  /* 34-0x22 - DRAM table offsets */
 	u8 partnum2[5];             /* 50-0x32 - part number        */
 	u8 reserved[5];             /* 55 0x37 - reserved           */
-	u16 fsp_drate;              /* 60-0x3c - U-Boot ddr_dram_fsp_msg.drate */
+	u32 ddr_crc32;              /* 60-0x3c - CRC32 of DDR DATA */
+	u16 fsp_drate;              /* 64-0x40 - U-Boot ddr_dram_fsp_msg.drate */
 };
 
 #define VAR_EEPROM_DATA ((struct var_eeprom *)VAR_EEPROM_DRAM_START)
