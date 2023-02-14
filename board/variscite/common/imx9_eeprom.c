@@ -37,6 +37,9 @@ static int var_eeprom_get_dev(struct udevice **devp)
 		return ret;
 	}
 
+	i2c_set_chip_offset_len(*devp, 1);
+	i2c_set_chip_addr_offset_mask(*devp, 1);
+
 	return 0;
 }
 
