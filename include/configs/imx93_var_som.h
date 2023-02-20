@@ -49,14 +49,6 @@
 #define BOOTENV
 #endif
 
-#define JAILHOUSE_ENV \
-	"jh_mmcboot=setenv fdtfile imx93-11x11-evk-root.dtb; " \
-		    "setenv jh_clk clk_ignore_unused mem=1248MB kvm-arm.mode=nvhe; " \
-		    "if run loadimage; then run mmcboot;" \
-		    "else run jh_netboot; fi; \0" \
-	"jh_netboot=setenv fdtfile imx93-11x11-evk-root.dtb; " \
-		    "setenv jh_clk clk_ignore_unused mem=1248MB kvm-arm.mode=nvhe; run netboot; \0 "
-
 #define CONFIG_MFG_ENV_SETTINGS \
 	CONFIG_MFG_ENV_SETTINGS_DEFAULT \
 	"initrd_addr=0x83800000\0" \
@@ -66,7 +58,6 @@
 
 /* Initial environment variables */
 #define CONFIG_EXTRA_ENV_SETTINGS		\
-	JAILHOUSE_ENV \
 	CONFIG_MFG_ENV_SETTINGS \
 	BOOTENV \
 	AHAB_ENV \
@@ -82,7 +73,7 @@
 	"cntr_file=os_cntr_signed.bin\0" \
 	"boot_fit=no\0" \
 	"bootdir=/boot\0" \
-	"fdtfile=" CONFIG_DEFAULT_FDT_FILE "\0" \
+	"fdt_file=undefined\0" \
 	"bootm_size=0x10000000\0" \
 	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
 	"mmcpart=1\0" \
@@ -94,7 +85,12 @@
 	"bootscript=echo Running bootscript from mmc ...; " \
 		"source\0" \
 	"loadimage=load mmc ${mmcdev}:${mmcpart} ${loadaddr} ${bootdir}/${image}\0" \
-	"loadfdt=load mmc ${mmcdev}:${mmcpart} ${fdt_addr_r} ${bootdir}/${fdtfile}\0" \
+	"findfdt=" \
+		"if test $fdt_file = undefined; then " \
+			"setenv fdt_file "CONFIG_DEFAULT_FDT_FILE"; " \
+		"fi; " \
+		"echo fdt_file=${fdt_file};\0" \
+	"loadfdt=run findfdt;load mmc ${mmcdev}:${mmcpart} ${fdt_addr_r} ${bootdir}/${fdt_file}\0" \
 	"loadcntr=fatload mmc ${mmcdev}:${mmcpart} ${cntr_addr} ${cntr_file}\0" \
 	"auth_os=auth_cntr ${cntr_addr}\0" \
 	"boot_os=booti ${loadaddr} - ${fdt_addr_r};\0" \
@@ -141,7 +137,8 @@
 			"if test ${boot_fit} = yes || test ${boot_fit} = try; then " \
 				"bootm ${loadaddr}; " \
 			"else " \
-				"if ${get_cmd} ${fdt_addr_r} ${fdtfile}; then " \
+				"run findfdt; " \
+				"if ${get_cmd} ${fdt_addr_r} ${fdt_file}; then " \
 					"run boot_os; " \
 				"else " \
 					"echo WARN: Cannot load the DT; " \
