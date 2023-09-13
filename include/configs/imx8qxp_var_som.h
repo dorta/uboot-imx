@@ -14,7 +14,6 @@
 #include "imx_env.h"
 
 #ifdef CONFIG_SPL_BUILD
-#define CONFIG_SPL_MAX_SIZE				(192 * 1024)
 #define CONFIG_SYS_MONITOR_LEN				(1024 * 1024)
 
 /*
@@ -22,12 +21,6 @@
   * So 3rd container image may start from 0x8181000
  */
 #define CONFIG_SYS_UBOOT_BASE 			0x08181000
-
-#define CONFIG_SPL_STACK		0x013fff0
-#define CONFIG_SPL_BSS_START_ADDR	0x00130000
-#define CONFIG_SPL_BSS_MAX_SIZE		0x1000		/* 4 KB */
-#define CONFIG_SYS_SPL_MALLOC_START	0x82200000
-#define CONFIG_SYS_SPL_MALLOC_SIZE	0x80000		/* 512 KB */
 #define CONFIG_MALLOC_F_ADDR		0x00138000
 
 #define CONFIG_SPL_RAW_IMAGE_ARM_TRUSTED_FIRMWARE
@@ -35,8 +28,6 @@
 #define CONFIG_SPL_ABORT_ON_RAW_IMAGE
 
 #endif
-
-#define CONFIG_CMD_READ
 
 /* Flat Device Tree Definitions */
 
@@ -161,10 +152,6 @@
 		"setenv splashimage 0x83100000\0" \
 	"splashdisable=setenv splashfile; setenv splashimage\0"
 
-/* Link Definitions */
-
-#define CONFIG_SYS_INIT_SP_ADDR		0x80200000
-
 /* USDHC1 is for eMMC, USDHC2 is for SD on carrier board */
 #define CONFIG_SYS_FSL_USDHC_NUM	2
 
@@ -194,11 +181,6 @@
 
 /* Monitor Command Prompt */
 #define CONFIG_SYS_PROMPT_HUSH_PS2	"> "
-#define CONFIG_SYS_CBSIZE		2048
-#define CONFIG_SYS_MAXARGS		64
-#define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE
-#define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE + sizeof(CONFIG_SYS_PROMPT) + 16)
-
 /* Generic Timer Definitions */
 #define COUNTER_FREQUENCY		8000000	/* 8MHz */
 
