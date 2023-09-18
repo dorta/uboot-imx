@@ -14,7 +14,6 @@
 #include "imx_env.h"
 
 #ifdef CONFIG_SPL_BUILD
-#define CONFIG_SYS_MONITOR_LEN				(1024 * 1024)
 
 /*
  * 0x08081000 - 0x08180FFF is for m4_0 xip image,
