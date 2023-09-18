@@ -152,9 +152,6 @@
 		"setenv splashimage 0x83100000\0" \
 	"splashdisable=setenv splashfile; setenv splashimage\0"
 
-/* USDHC1 is for eMMC, USDHC2 is for SD on carrier board */
-#define CONFIG_SYS_FSL_USDHC_NUM	2
-
 /* Size of malloc() pool */
 
 #define CONFIG_SYS_SDRAM_BASE		0x80000000
