@@ -200,7 +200,6 @@
 #define CONFIG_ETHPRIME			"eth1"
 #endif
 
-#define CONFIG_FEC_XCV_TYPE		RGMII
 #define PHY_ANEG_TIMEOUT		20000
 
 /* Splash screen */
